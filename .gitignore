@@ -1,0 +1,7 @@
+src/alias/
+src/config/
+src/io/
+src/recipe/
+src/install/
+.DS_Store
+.idea/
