@@ -1,7 +1,12 @@
-src/alias/
-src/config/
-src/io/
-src/recipe/
-src/install/
+src/alias/*
+!src/alias/gitkeep
+src/config/*
+!src/config/gitkeep
+src/io/*
+!src/io/gitkeep
+src/recipes/*
+!src/recipes/gitkeep
+src/install/*
+!src/install/gitkeep
 .DS_Store
 .idea/
