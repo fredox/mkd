@@ -16,6 +16,7 @@ require_once('SerializeddatafileToPgsqlMonad.php');
 require_once('RawToSerializeddatafileMonad.php');
 require_once('SqlToSqlMonad.php');
 require_once('RawToPgsqlMonad.php');
+require_once('MysqlToPgsqlMonad.php');
 
 class MonadFactory
 {

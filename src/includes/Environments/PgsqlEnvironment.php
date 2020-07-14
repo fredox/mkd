@@ -105,6 +105,11 @@ class PgsqlEnvironment implements Environment, Queryable
 
         Output::print_msg("[PGSQL] Optimized import for tables: " . implode(", ", array_keys($data)), "INFO");
         foreach ($data as $table => $queries) {
+            if (empty($queries)) {
+                Output::print_msg("[PGSQL] No rows to import on table: " . $table, "INFO");
+                continue;
+            }
+
             foreach ($queries as $query) {
                 $finalQuery .= $query . "; ";
             }

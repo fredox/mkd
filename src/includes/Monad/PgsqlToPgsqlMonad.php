@@ -33,9 +33,13 @@ class PgsqlToPgsqlMonad extends SqlToSqlMonad implements Monad
         }
 
         if ($fieldsDefinition[$field]['default'] == "") {
-            return "''";
+            if (self::isInt($fieldsDefinition[$field])) {
+                return 0;
+            } else {
+                return "''";
+            }
         }
-
+        
         $value = $fieldsDefinition[$field]['default'];
 
         return $this->wrapNonEmptyValue($value, $fieldsDefinition[$field]);
@@ -60,7 +64,7 @@ class PgsqlToPgsqlMonad extends SqlToSqlMonad implements Monad
 
     public function isInt($fieldDefinition)
     {
-        $intTypes = ['int2', 'int4', 'int8'];
+        $intTypes = ['int2', 'int4', 'int8', 'bigint'];
         return in_array($fieldDefinition['type'], $intTypes);
     }
 }
