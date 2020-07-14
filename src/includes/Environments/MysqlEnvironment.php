@@ -40,7 +40,6 @@ class MysqlEnvironment implements Environment, Queryable
             Output::out_print("[CACHED]");
             $connection = static::$cachedConnections[$cacheHash];
         } else {
-            Output::print_msg("Could not connect to " . $this->name . " environment", "ERROR");
             $connection = new mysqli($host, $user, $password, $dbname, $port, $socket)
                 or die("Could not connect to " . $this->name . " environment");
 

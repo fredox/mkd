@@ -6,7 +6,7 @@ class Install {
     public static $configs = [];
     public static $recipes = [];
 
-    public static $excludedDirs = ['.', '..', '.DS_Store'];
+    public static $excludedDirs = ['.', '..', '.DS_Store', '.gitkeep'];
 
     public static $installFile = 'install';
 
@@ -159,5 +159,18 @@ class Install {
             }
 
         }
+    }
+
+    public static function removeGitKeep($arrayFileDir)
+    {
+        $result = [];
+
+        foreach ($arrayFileDir as $file) {
+            if ($file != '.gitkeep') {
+                $result[] = $file;
+            }
+        }
+
+        return $result;
     }
 }
