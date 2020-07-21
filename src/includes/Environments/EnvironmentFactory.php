@@ -7,6 +7,7 @@ include_once('KeyFileEnvironment.php');
 include_once('RawEnvironment.php');
 include_once('SerializedDataFileEnvironment.php');
 include_once('CheckEnvironment.php');
+include_once('MongoDbEnvironment.php');
 
 class EnvironmentFactory
 {
@@ -93,6 +94,15 @@ class EnvironmentFactory
                     $environmentConfig['name'],
                     $environmentConfig['filePath'],
                     $environmentConfig['configPath']
+                );
+            case 'mongodb':
+                return new MongoDbEnvironment(
+                    $environmentConfig['name'],
+                    $environmentConfig['host'],
+                    $environmentConfig['port'],
+                    $environmentConfig['dbname'],
+                    $environmentConfig['usr'],
+                    $environmentConfig['psw']
                 );
 			default:
 				die($errorMsg . ". Type: " . $environmentConfig['type'] . "\n\n");

@@ -3,7 +3,7 @@
 
 class JsonTableConverter
 {
-    public static function saveJson($data, $fileName=false)
+    public static function saveJsonFromTabData($data, $fileName=false)
     {
         if (count($data) == 0) {
             return;

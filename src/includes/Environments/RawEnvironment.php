@@ -58,7 +58,7 @@ class RawEnvironment implements Environment
         }
     }
 
-    public function prettyPrintTables($data) {
+    public function prettyPrintTables($data, $prefix="") {
         foreach ($data as $table => $rows) {
             Output::print_msg(whiteFormat(" " . $table . " "));
             if (empty($rows)) {
@@ -67,17 +67,33 @@ class RawEnvironment implements Environment
             }
             foreach ($rows as $row) {
                 Output::print_msg("----------");
-                foreach ($row as $field=>$value) {
-                    Output::print_msg(blueFormat($field . ": ") . magentaFormat($value));
-                }
+                $this->printFields($row);
             }
         }
     }
 
-    private function saveJson($data)
+    public function printFields($row, $prefix="") {
+        foreach ($row as $field=>$value) {
+            if (is_array($value)) {
+                Output::print_msg($prefix . blueFormat($field . ": "));
+                $this->printFields($value, "  " . $prefix);
+            } else {
+                Output::print_msg($prefix . blueFormat($field . ": ") . magentaFormat($value));
+            }
+        }
+    }
+
+    private function saveJsonFromTabData($data)
     {
         $fileName = ($this->file) ? $this->file : false;
-        JsonTableConverter::saveJson($data, $fileName);
+        JsonTableConverter::saveJsonFromTabData($data, $fileName);
+    }
+
+    private function saveJson($data)
+    {
+        foreach ($data as $dataIndex => $rows) {
+            file_put_contents('json-' . $dataIndex . '.json', json_encode($rows));
+        }
     }
 
     public function describe($dataIndex)

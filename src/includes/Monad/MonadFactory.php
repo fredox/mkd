@@ -25,18 +25,13 @@ class MonadFactory
         $sourceEnvironmentType = ucfirst(strtolower($sourceEnvironment->getType()));
         $targetEnvironmentType = ucfirst(strtolower($targetEnvironment->getType()));
 
-        if ($targetEnvironment->getType() == 'DryRun') {
-            $virtualEnvironmentIndex = $config['environments'][$targetEnvironment->name]['targetEnvironment'];
-            $subType = $config['environments'][$virtualEnvironmentIndex]['type'];
-            $targetEnvironmentType = ucfirst(strtolower($subType)) . $targetEnvironmentType;
-        }
-
         $monadNameClass = $sourceEnvironmentType . 'To' . $targetEnvironmentType . 'Monad';
 
         if (!class_exists($monadNameClass)) {
+            Output::print_msg("Default adapter id with name: " . $monadNameClass, "INFO");
             return new idMonad($config);
         }
-
+        Output::print_msg("Adapter found:" . $monadNameClass, "INFO");
         return new $monadNameClass($config);
     }
 }
