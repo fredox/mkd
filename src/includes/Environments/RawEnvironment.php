@@ -92,7 +92,9 @@ class RawEnvironment implements Environment
     private function saveJson($data)
     {
         foreach ($data as $dataIndex => $rows) {
-            file_put_contents('json-' . $dataIndex . '.json', json_encode($rows));
+            $fileName = ($this->file) ? './io/' . $this->file . '-' . $dataIndex . '.json' : './io/' . $dataIndex . '.json';
+            Output::print_msg("Saving json in file: " . blueFormat($fileName));
+            file_put_contents($fileName, json_encode($rows));
         }
     }
 

@@ -5,6 +5,7 @@ class Install {
     public static $aliases = [];
     public static $configs = [];
     public static $recipes = [];
+    public static $scripts = [];
 
     public static $excludedDirs = ['.', '..', '.DS_Store', '.gitkeep'];
 
@@ -50,6 +51,15 @@ class Install {
             foreach ($recipeDirs as $dir) {
                 self::rmDirectoryContent('recipes/' . $dir);
                 rmdir('recipes/' . $dir);
+            }
+        }
+
+        $scriptDirs = array_diff(scandir('scripts'), self::$excludedDirs);
+
+        if ($scriptDirs) {
+            foreach ($scriptDirs as $dir) {
+                self::rmDirectoryContent('scripts/' . $dir);
+                rmdir('scripts/' . $dir);
             }
         }
 
@@ -103,6 +113,18 @@ class Install {
                 }
 
             }
+
+            Output::print_msg("Adding scripts", "INSTALL");
+            foreach ($cleanData['scripts'] as $dir => $files) {
+                if (!is_dir('scripts/' . $dir)) {
+                    mkdir('scripts/' . $dir);
+                }
+                Output::print_msg("Adding scripts for [" . $dir . "]", "INSTALL");
+                foreach ($files as $filename => $fileContent) {
+                    file_put_contents('scripts/' . $dir . '/' . $filename , $fileContent);
+                }
+
+            }
         }
         Output::print_msg("End Install", "INSTALL", true);
     }
@@ -116,7 +138,8 @@ class Install {
         $install = [
             'aliases' => self::$aliases,
             'configs' => self::$configs,
-            'recipes' => self::$recipes
+            'recipes' => self::$recipes,
+            'scripts' => self::$scripts
         ];
 
         file_put_contents('install/' . self::$installFile . '.serialized', serialize($install));
@@ -156,6 +179,21 @@ class Install {
             foreach ($files as $file) {
                 Output::print_msg("exporting recipe " . $file, "MAKE-INSTALL");
                 self::$recipes[$dir][$file] = file_get_contents('recipes/' . $dir . '/' . $file);
+            }
+
+        }
+    }
+
+    public static function getScripts()
+    {
+        $directories = array_diff(scandir('scripts'), self::$excludedDirs);
+        Output::print_msg("exporting scripts", "MAKE-INSTALL");
+        foreach ($directories as $dir) {
+            $files  = array_diff(scandir('scripts/' . $dir), self::$excludedDirs);
+
+            foreach ($files as $file) {
+                Output::print_msg("exporting script " . $file, "MAKE-INSTALL");
+                self::$scripts[$dir][$file] = file_get_contents('scripts/' . $dir . '/' . $file);
             }
 
         }

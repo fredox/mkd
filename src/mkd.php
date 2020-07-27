@@ -145,8 +145,7 @@ class Mikado {
 
         if (preg_match('/^cfg:([a-zA-Z0-9]+)$/', $args[0], $matches)) {
             $configPath = $matches[1];
-            $config = ['commands' => []];
-            require_once('config/' . $configPath . '/config.php');
+            require('config/' . $configPath . '/config.php');
         } else {
             Output::print_msg("No command detected", "INFO");
             return;
@@ -166,6 +165,7 @@ class Mikado {
         }
 
         if ($args[1] == '-cmd' && !empty($args[2])) {
+            Output::print_msg("Command detected: " . $args[2], "INFO");
             $executedCommand = true;
             $command = $args[2];
 
@@ -177,14 +177,19 @@ class Mikado {
                 // fill the command with $[0-9]+ params
                 $commandParams = array_slice($args, 3);
                 foreach ($commandParams as $index => $param) {
-                    $realCommand = str_replace("$" . ($index + 1), $param, $realCommand);
+                    $realCommand = str_replace("$" . ($index), $param, $realCommand);
                 }
+
+                Output::print_msg("Executing command: " . $realCommand, "INFO");
 
                 exec($realCommand, $outputLines, $result);
                 foreach ($outputLines as $outputLine) {
                     Output::print_msg($outputLine, "COMMAND][OUTPUT");
                 }
                 Output::print_msg($result, "COMMAND][EXIT RESULT");
+            } else {
+                print_r($config);
+                Output::print_msg("Command " . $args[2] . " not available in config. Found: " . implode(array_keys($config['commands'])), "ERROR");
             }
         }
 
