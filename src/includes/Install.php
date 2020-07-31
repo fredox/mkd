@@ -134,6 +134,7 @@ class Install {
         self::getAlias();
         self::getConfigs();
         self::getRecipes();
+        self::getScripts();
 
         $install = [
             'aliases' => self::$aliases,
