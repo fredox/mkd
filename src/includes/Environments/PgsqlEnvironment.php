@@ -239,7 +239,7 @@ class PgsqlEnvironment implements Environment, Queryable
             if ($this->getPrimaryKeyField($tableNameIndex) === false) {
                 continue;
             }
-            if (is_numeric(static::$savedPrimaryKeys[$tableNameIndex][0]) && ($this->getPrimaryKeyField($tableNameIndex)['udt_name'] != 'varchar')) {
+            if (array_key_exists(0, static::$savedPrimaryKeys[$tableNameIndex]) && is_numeric(static::$savedPrimaryKeys[$tableNameIndex][0]) && ($this->getPrimaryKeyField($tableNameIndex)['udt_name'] != 'varchar')) {
                 $replacement = implode(',', static::$savedPrimaryKeys[$tableNameIndex]);
             } else {
                 $replacement = "'" . implode("','", static::$savedPrimaryKeys[$tableNameIndex]) . "'";
