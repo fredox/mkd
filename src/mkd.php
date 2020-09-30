@@ -188,8 +188,7 @@ class Mikado {
                 }
                 Output::print_msg($result, "COMMAND][EXIT RESULT");
             } else {
-                print_r($config);
-                Output::print_msg("Command " . $args[2] . " not available in config. Found: " . implode(array_keys($config['commands'])), "ERROR");
+                Output::print_msg("Command " . $args[2] . " not available in config. Found: " . implode(array_keys($config['commands']), ','), "ERROR");
             }
         }
 
