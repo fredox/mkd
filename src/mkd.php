@@ -17,41 +17,21 @@ include_once('includes/Logo.php');
 include_once('includes/Output.php');
 include_once('includes/JsonTableConverter.php');
 
-Logo::startLogo();
-
-//remove script name from params
 array_shift($argv);
 
-Install::checkCreateInstall($argv);
-Help::checkHelp($argv);
+Script::open();
 
-$params = Alias::checkAlias($argv);
-
-if (array_key_exists(0, $params)) {
-    Health::checkHealth($params[0], $argv);
-    Analyze::checkAnalyze($params[0], $argv);
-    Clean::checkClean($params[0]);
+if ($argv[0] != '-i') {
+    Mikado::execute($argv);
+} else {
+    Mikado::interactive();
 }
 
-InputHelp::getHelp($params);
-
-Output::print_msg("Timer starts.", "INFO");
-Timer::start('script');
-
-Mikado::start($params);
-
-Logo::endLogo();
-Output::print_msg("Timer, Elapsed: " . round(Timer::elapsed('script'),1) . " seconds\n\n", "INFO");
 
 class Mikado {
 
     public static function start($args)
     {
-        if (count($args) == 1 && $args[0] == '-clean') {
-            Clean::deleteIoFiles();
-            return;
-        }
-
         if (!preg_match("/^(?:recipe|r):(.*)$/", $args[0], $matches)) {
             static::run($args);
         } else {
@@ -59,6 +39,38 @@ class Mikado {
             array_shift($args);
             static::bakeRecipe($args, $recipe);
         }
+    }
+
+    public static function execute($args)
+    {
+        Logo::startLogo();
+
+        Install::checkCreateInstall($args);
+        if (Script::isOpen()) { Help::checkHelp($args); }
+
+        $params = Alias::checkAlias($args);
+
+        if (array_key_exists(0, $params)) {
+            if (Script::isOpen()) { Health::checkHealth($params[0], $args); }
+            if (Script::isOpen()) { Analyze::checkAnalyze($params[0], $args); }
+            if (Script::isOpen()) { Clean::checkClean($params[0]); }
+        }
+
+        if (Script::isOpen()) { InputHelp::getHelp($params); }
+        if (Script::isOpen()) { Output::print_msg("Timer starts.", "INFO"); }
+        if (Script::isOpen()) { Timer::start('script'); }
+        if (Script::isOpen()) { Mikado::start($params); }
+        if (Script::isOpen()) { Output::print_msg("Timer, Elapsed: " . round(Timer::elapsed('script'),1) . " seconds\n\n", "INFO"); }
+        if (Script::isOpen()) { Output::print_msg(" Memory usage: " . self::convert(memory_get_usage(true))); }
+
+
+        Logo::endLogo();
+    }
+
+    public static function convert($size)
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
 
     public static function checkConfig($config, $queries, $configPath)
@@ -330,6 +342,49 @@ class Mikado {
         }
 
         return $keys;
+    }
+
+    public static function interactive()
+    {
+        $quitParams = ['quit', 'exit', 'adios'];
+
+        Output::print_msg("Mikado interactive >", "INFO", false);
+        Output::intro();
+
+        do {
+            Script::open();
+
+            $cmd = trim((readline(magentaFormat("\n\t mkd> "))));
+            readline_add_history($cmd);
+            $params = explode(' ', $cmd);
+
+            if (!in_array($params[0], $quitParams)) {
+                Mikado::execute($params);
+            }
+
+        } while (!in_array($params[0], $quitParams));
+
+        Output::print_msg("Mikado interactive END. See you soon!\n\n", "INFO", false);
+    }
+}
+
+class Script {
+    public static $status = 'NONE';
+
+    public static function open() {
+        self::$status = 'OPEN';
+    }
+
+    public static function close() {
+        self::$status = 'CLOSED';
+    }
+
+    public static function isClosed() {
+        return self::$status == 'CLOSED';
+    }
+
+    public static function isOpen() {
+        return self::$status == 'OPEN';
     }
 }
 

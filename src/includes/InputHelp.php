@@ -10,49 +10,49 @@ class InputHelp {
         if (empty($args)) {
             static::showDefaultConfigEnvironments();
             Output::print_msg();
-            Output::intro(2, true);
+            Output::intro(1, true);
         }
 
         $commandArgs = implode(' ', $args);
 
         if (preg_match("/^(recipe|r):$/", $commandArgs)) {
             static::showRecipes();
-            Output::intro(2, true);
+            Output::intro(1, true);
         }
 
         if (preg_match("/^(recipe|r): -v$/", $commandArgs)) {
             static::showRecipes($verbose=true);
-            Output::intro(2, true);
+            Output::intro(1, true);
         }
 
         if (preg_match("/^cfg:$/", $commandArgs)) {
             static::showConfigFolders();
-            Output::intro(2, true);
+            Output::intro(1, true);
         }
 
         if (preg_match("/^cfg:([^\s:]+) ?$/", $commandArgs, $matches)) {
             static::showConfigEnvironments($matches[1]);
-            Output::intro(2, true);
+            Output::intro(1, true);
         }
 
         if (preg_match("/^cfg:([^\s:]+): ?$/", $commandArgs, $matches)) {
             static::showConfigGroups($matches[1]);
-            Output::intro(2, true);
+            Output::intro(1, true);
         }
 
         if (preg_match("/^cfg:([^\s:]+):: ?$/", $commandArgs, $matches)) {
             static::showQueries($matches[1]);
-            Output::intro(2, true);
+            Output::intro(1, true);
         }
 
         if (preg_match("/^cfg:([^\s:]+)::([^\s]+) ?$/", $commandArgs, $matches)) {
             static::showConfigEnvironments($matches[1]);
-            Output::intro(2, true);
+            Output::intro(1, true);
         }
 
         if (preg_match("/^cfg:([^\s]+):([^\s]+) ?$/", $commandArgs, $matches)) {
             static::showConfigEnvironments($matches[1]);
-            Output::intro(2, true);
+            Output::intro(1, true);
         }
     }
 
@@ -123,9 +123,10 @@ class InputHelp {
     {
         $config = array();
 
-        include_once('config/' . $configPath . '/config.php');
+        include('config/' . $configPath . '/config.php');
 
         if ((!array_key_exists('groups', $config)) || !$config['groups']) {
+            print_r($config);
             Output::print_msg("groups key it is not set on config [". $configPath ."]\n\n", "ERROR", true);
         }
 

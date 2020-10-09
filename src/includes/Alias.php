@@ -16,8 +16,6 @@ Class Alias {
             $aliasIndex = $matches[0];
             Output::print_msg("Replacing alias by: [" . $aliases[$aliasIndex]['slug'] . "]");
             $params = self::getParams($aliases[$aliasIndex]['slug'], $params);
-        } else {
-            Output::print_msg("No aliases detected", "ALIAS");
         }
 
         return $params;
@@ -48,7 +46,7 @@ Class Alias {
             Output::print_msg("+ ---------");
         }
 
-        Output::intro(2, true);
+        Output::intro(1, true);
     }
 
     public static function getAliases()

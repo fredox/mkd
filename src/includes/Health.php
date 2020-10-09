@@ -30,7 +30,8 @@ Class Health {
         if (!array_key_exists(1, $params)) {
             Output::print_msg("Health param must be preceded by a config folder\n\n", "ERROR][HEALTH");
             InputHelp::showConfigFolders();
-            exit;
+            Script::close();
+            return;
         }
 
         if (is_dir('config/' . $params[1])) {

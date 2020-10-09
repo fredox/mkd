@@ -22,7 +22,7 @@ class Output {
         }
 
         if($exit) {
-            exit();
+            Script::close();
         }
     }
 
