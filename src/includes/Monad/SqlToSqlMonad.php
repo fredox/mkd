@@ -39,18 +39,27 @@ class SqlToSqlMonad {
                 exit;
             }
 
-            foreach ($rows as $index => $row) {
+            $primaryField = $this->getPrimaryKeyField($fieldsDefinition);
+            $existingKeys = $this->existingKeys($rows, $tableName, $primaryField, $targetEnvironment);
+            $tableExistingKeys = 0;
 
+            foreach ($rows as $index => $row) {
+                if (in_array($row[$primaryField['name']], $existingKeys)) {
+                    $tableExistingKeys++;
+                    continue;
+                }
                 foreach ($fieldsDefinition as $fieldName => $fieldDefinition) {
                     $finalData[$tableName][$index][$fieldName] = $this->getPreparedValue($fieldName, $row, $fieldsDefinition);
                 }
             }
-
+            if ($tableExistingKeys > 0) {
+                Output::print_msg("Table [" . $tableName . "] already have " . $tableExistingKeys . " rows.", "INFO");
+            }
         }
 
         foreach ($finalData as $tableName => $rows) {
 
-            $fields = array_keys($rows[0]);
+            $fields = array_keys(reset($rows));
 
             $insertedRows = 0;
             $nRows  = count($rows);
@@ -76,6 +85,38 @@ class SqlToSqlMonad {
         }
 
         return $sqlData;
+    }
+
+    public function existingKeys($rows, $table, $primaryField, $targetEnvironment)
+    {
+        $existingKeys = [];
+
+        if (!$targetEnvironment instanceof Queryable) {
+            return $existingKeys;
+        }
+
+        if ($primaryField !== false) {
+            $rowKeys = [];
+            foreach ($rows as $row) {
+                $rowKeys[] = $primaryField['isText'] ? "'" . $row[$primaryField['name']] . "'" : $row[$primaryField['name']];
+            }
+            $query = "SELECT " . $primaryField['name'] . " as k FROM " . $table . " WHERE " . $primaryField['name'] . " IN (" . implode(",", $rowKeys) . ");";
+            $existingKeys = $targetEnvironment->query($query, true);
+            $existingKeys = array_map(function($row) { return $row['k']; }, $existingKeys);
+        }
+
+        return $existingKeys;
+    }
+
+    public function getPrimaryKeyField($fieldsDefinition)
+    {
+        foreach ($fieldsDefinition as $fieldName => $field) {
+            if ($field['key'] == "PRI") {
+                return ['name' => $fieldName, 'isText' => $field['isText']];
+            }
+        }
+
+        return false;
     }
 
 
