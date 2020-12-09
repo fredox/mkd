@@ -64,7 +64,7 @@ class PgsqlToPgsqlMonad extends SqlToSqlMonad implements Monad
 
     public function isInt($fieldDefinition)
     {
-        $intTypes = ['int2', 'int4', 'int8', 'bigint'];
+        $intTypes = ['int2', 'int4', 'int8', 'bigint', 'float4'];
         return in_array($fieldDefinition['type'], $intTypes);
     }
 }

@@ -41,7 +41,7 @@ Class Alias {
         Output::print_msg("+---------");
 
         foreach ($aliases as $alias => $aliasInfo) {
-            Output::print_msg("| " . whiteFormat(" " . $alias . " ") . "\t" . $aliasInfo['help']);
+            Output::print_msg("| " . whiteFormat(" " . $alias . " ") . "  " . $aliasInfo['help']);
             Output::print_msg("|  \tReplaced command slug > " . $aliasInfo['slug']);
             Output::print_msg("+ ---------");
         }
