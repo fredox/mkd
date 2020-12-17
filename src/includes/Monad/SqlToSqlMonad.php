@@ -44,7 +44,7 @@ class SqlToSqlMonad {
             $tableExistingKeys = 0;
 
             foreach ($rows as $index => $row) {
-                if (in_array($row[$primaryField['name']], $existingKeys)) {
+                if ($primaryField !== false && in_array($row[$primaryField['name']], $existingKeys)) {
                     $tableExistingKeys++;
                     continue;
                 }
