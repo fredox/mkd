@@ -148,13 +148,15 @@ class PgsqlEnvironment implements Environment, Queryable
             if (empty($result)) {
                 $pkInfo = $this->describe($tableName, true);
 
-                if ($pkInfo['isText']) {
-                    $emptyResult = array(array('result' => ''));
-                } else {
-                    $emptyResult = array(array('result' => 0));
-                }
+                if ($pkInfo !== false) {
+                    if ($pkInfo['isText']) {
+                        $emptyResult = array(array('result' => ''));
+                    } else {
+                        $emptyResult = array(array('result' => 0));
+                    }
 
-                $this->savePrimaryKeys($tableName, $tableNameIndex, $emptyResult);
+                    $this->savePrimaryKeys($tableName, $tableNameIndex, $emptyResult);
+                }
                 Output::out_print(warningFormat(" no data "));
                 if (empty($finalResult[$tableName])) {
                     $finalResult[$tableName] = false;
@@ -306,7 +308,11 @@ class PgsqlEnvironment implements Environment, Queryable
 
             $hashFields[$fieldName]['type']    = $fieldInformation['udt_name'];
             $hashFields[$fieldName]['null']    = $fieldInformation['is_nullable'];
-            $hashFields[$fieldName]['key']     = ($fieldName == $this->getPrimaryKeyField($table)['column_name']) ? "PRI" : "";
+            if ($this->getPrimaryKeyField($table) === false) {
+                $hashFields[$fieldName]['key'] = "";
+            } else {
+                $hashFields[$fieldName]['key'] = ($fieldName == $this->getPrimaryKeyField($table)['column_name']) ? "PRI" : "";
+            }
             $hashFields[$fieldName]['default'] = $fieldInformation['column_default'];
 
             $hashFields[$fieldName]['isText'] = false;
@@ -317,10 +323,12 @@ class PgsqlEnvironment implements Environment, Queryable
                 $hashFields[$fieldName]['isText'] = true;
             }
 
-            if (($hashFields[$fieldName]['key'] == 'PRI')  && $pk){
+            if (($hashFields[$fieldName]['key'] == 'PRI') && $pk){
                 return $hashFields[$fieldName];
             }
         }
+
+        if ($pk) return false;
 
         return $hashFields;
     }
