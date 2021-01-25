@@ -143,6 +143,12 @@ class PgsqlEnvironment implements Environment, Queryable
             }
 
             Output::print_msg("[". $this->name ."] collecting data from ". whiteFormat("[" . $tableName . $comment . "]"), "INFO");
+
+            if (!$this->tableExists($tableName)) {
+                Output::out_print(warningFormat(" no table found "));
+                continue;
+            }
+
             $result = $this->query($query, true);
 
             if (empty($result)) {
@@ -183,6 +189,13 @@ class PgsqlEnvironment implements Environment, Queryable
         return $finalResult;
     }
 
+    public function tableExists($tableName)
+    {
+        $table = $this->query("SELECT * FROM information_schema.tables WHERE table_name = '" . $tableName . "'", true);
+
+        return (count($table) >= 1);
+    }
+
     public function getRealTableName($tableName)
     {
         if (strpos($tableName, ':') !== false) {
@@ -215,6 +228,11 @@ class PgsqlEnvironment implements Environment, Queryable
                 $primaryKeyField = $fieldName;
                 break;
             }
+        }
+
+        if ($primaryKeyField === false) {
+            static::$savedPrimaryKeys[$tableNameIndex] = [];
+            return;
         }
 
         $keysToSave = array_column($dataRows, $primaryKeyField);
